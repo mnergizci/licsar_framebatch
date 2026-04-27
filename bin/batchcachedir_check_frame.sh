@@ -177,6 +177,8 @@ done
           echo "there is a large gap - try running:"
           echo "framebatch_update_frame.sh -U "$frame gapfill ${fdate:0:4}-${fdate:4:2}-${fdate:6:2} ${ldate:0:4}-${ldate:4:2}-${ldate:6:2}
         fi
+        echo "automatically, we would run:"
+        echo framebatch_postproc_coreg.sh $postprocflag $frame 1
       fi
       if [ $PROC == 1 ]; then
            if [ ! -z $postprocflag ]; then
