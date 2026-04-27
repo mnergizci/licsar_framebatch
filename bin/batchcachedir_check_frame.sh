@@ -107,15 +107,26 @@ else
       firstslc=`ls $frame/SLC/???????? -d | rev | cut -d '/' -f 1 | rev | sed '/'$m'/d' | head -n 1`
       lastslc=`ls $frame/SLC/???????? -d | rev | cut -d '/' -f 1 | rev | sed '/'$m'/d' | tail -n 1`
       postprocflag='-f'
-        ls $frame/SLC > $frame/slcs.t.txt
-        echo $firstrslc >> $frame/slcs.t.txt
-        echo $lastrslc >> $frame/slcs.t.txt
-        sort -u $frame/slcs.t.txt > $frame/slcs.t2.txt
-        for r in $firstrslc $lastrslc; do
-          for s in `grep -A 1 -B 1 $r $frame/slcs.t2.txt | sed '/'$m'/d'`; do
-            if [ `datediff $s $r 1` -lt 180 ]; then postprocflag=''; break; fi
-          done
-        done
+      # ls $frame/SLC | sed '/'$m'/d' > $frame/slcs.t.txt
+      ls $frame/RSLC > $frame/rslcs.t.txt
+      
+for s in `ls $frame/SLC | sed '/'$m'/d'`; do
+# read closest diff < <(
+closestr=`awk -v target="$s" '
+  {
+      d = $1 - target
+      if (d < 0) d = -d
+      if (NR == 1 || d < min) {
+          min = d
+          closest = $1
+      }
+  }
+  END { print closest }
+  ' $frame/rslcs.t.txt`
+if [ `datediff $s $closestr 1` -lt 180 ]; then postprocflag=''; break; fi
+done
+
+
       if [ ! -z $postprocflag ]; then
         # echo "there is a large gap - try running:"
         if [ $firstrslc -lt $firstslc ]; then fdate=$firstrslc; else fdate=$firstslc; fi
