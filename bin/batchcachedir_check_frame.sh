@@ -18,6 +18,7 @@ todel=0
 rm -f $frame/check_lotus_jobs 2>/dev/null
 bjobs | grep $frame > $frame/check_lotus_jobs
 
+echo "checking frame "$frame
 if [ `cat $frame/check_lotus_jobs | wc -l` -gt 0 ]; then
   if [ `grep gapfill_out $frame/check_lotus_jobs | grep -c PENDING` -gt 0 ]; then echo "the processing already runs in queue - exiting"; exit; fi
   echo "WARNING - this frame is under processing already - better check manually";
@@ -41,9 +42,15 @@ if [ -d $frame/geo ]; then
    fi;
  fi
 elif [ -d $frame ]; then
- echo "no geo folder inside the frame directory - maybe under processing - cancelling"
- # mkdir -p todelete; if [ -d todelete/$frame ]; then rm -r todelete/$frame; fi; mv $frame todelete/.; exit
- exit
+ echo "no geo folder inside the frame directory"
+ if [ ! -f $frame/$frame'_db_query.list' ]; then
+  echo "seems finished - moving to todelete folder"
+  mkdir -p todelete; if [ -d todelete/$frame ]; then rm -r todelete/$frame; fi; mv $frame todelete/.;
+  exit
+ else
+  echo "perhaps under processing - cancelling"
+  exit
+ fi
 else
  echo "no such frame dir, cancel"
  exit
@@ -137,10 +144,11 @@ else
         fi
       fi
       if [ $PROC == 1 ]; then
-           if [ ! -z $postprocflag ]; then echo "WARNING, we would now process through the long gap - probably causing SD error";
-              echo "well... on your responsibility... please run:"
-              echo framebatch_postproc_coreg.sh $postprocflag $frame 1
-              exit
+           if [ ! -z $postprocflag ]; then
+              echo "WARNING, we will now process through the long gap - it would probably cause SD error";
+              #echo "well... on your responsibility... please run:"
+              #echo framebatch_postproc_coreg.sh $postprocflag $frame 1
+              #exit
            fi
            #if [ $slcdates -lt 5 ]; then
            #  batchcachedir_reprocess_from_slcs.sh $frame
@@ -174,6 +182,7 @@ else
       let expifgdates=4*$rslcdates'-4-4-3-2-1-1'  # -4 due to ref epoch in RSLC folder, -4 for the last RSLC, etc., last -1 only to allow -lt
       if [ $ifgdates -lt $expifgdates ]; then
        echo "this frame needs ifg gapfilling: "$frame
+       echo "(only "$ifgdates"/"$expifgdates" were generated)"
          if [ $PROC == 1 ]; then
            #batchcachedir_reprocess_ifgs.sh $frame
            cd $frame; ./framebatch_05_gap_filling.nowait.sh; cd -
