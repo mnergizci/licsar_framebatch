@@ -174,6 +174,7 @@ done
         if [ $nolut -lt 1 ]; then
           echo "postproc coreg should help here:"
           echo "framebatch_postproc_coreg.sh "$frame 1
+          postprocflag=''
         else
           echo "there is a large gap - try running:"
           echo "framebatch_update_frame.sh -U "$frame gapfill ${fdate:0:4}-${fdate:4:2}-${fdate:6:2} ${ldate:0:4}-${ldate:4:2}-${ldate:6:2}
