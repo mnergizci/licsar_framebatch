@@ -20,8 +20,14 @@ bjobs | grep $frame > $frame/check_lotus_jobs
 
 echo "checking frame "$frame
 if [ `cat $frame/check_lotus_jobs | wc -l` -gt 0 ]; then
-  if [ `grep gapfill_out $frame/check_lotus_jobs | grep -c PENDING` -gt 0 ]; then echo "the processing already runs in queue - exiting"; exit; fi
   echo "WARNING - this frame is under processing already - better check manually";
+  if [ $PROC -gt 0 ]; then
+    echo "setting autoprocessor OFF (only checking)"
+    PROC=0
+    if [ `grep gapfill_out $frame/check_lotus_jobs | grep -c PENDING` -gt 0 ]; then
+     echo "the gapfill processing already runs in queue - exiting"; exit;
+    fi
+  fi
 fi
 
 if [ `pwd` == $LiCSAR_public ]; then echo "NO.."; exit; fi
