@@ -76,7 +76,9 @@ else
    # check for unfinished SLCs:
    rm -f $frame/slccheck.list 2>/dev/null
    for ep in `gawk {'print $3'} $frame/framebatch_01_mk_image.list | sed 's/-//g' | sort`; do
-    if [ ! -d $frame/SLC/$ep ] && [ ! -d $frame/RSLC/$ep ] && [ ! -d $frame/SLC.missingbursts/$ep ]; then echo $ep >> $frame/slccheck.list; fi
+    if [ ! -d $frame/SLC/$ep ] && [ ! -d $frame/RSLC/$ep ] && [ ! -d $frame/SLC.missingbursts/$ep ]; then
+       echo $ep >> $frame/slccheck.list;
+    fi
    done
    if [ -f $frame/slccheck.list ]; then
      echo "this frame has unprocessed SLCs:"
@@ -91,6 +93,28 @@ else
      #exit
      echo "checking further"
      # echo "for now, only continuing"
+   fi
+   if [ $slcdates -gt 1 ]; then # check for SLC data issues
+     
+     for s in `ls $frame/SLC | sed '/'$m'/d'`; do
+       # mosaic check
+       if [ -f $frame/SLC/$s/$s.slc ]; then if [ ! -s $frame/SLC/$s/$s.slc ]; then
+         echo $s" slc mosaic is empty - removing"
+         rm $frame/SLC/$s/$s.slc $frame/SLC/$s/$s.slc.par
+         rm $frame/SLC/$s/$s.slc.mli $frame/SLC/$s/$s.slc.mli.par 2>/dev/null
+       fi; fi;
+       # slc check
+       for ms in `ls $frame/SLC/$m/$m.IW?.slc`; do
+         sext=`echo $ms | rev | cut -c -7 | rev`;
+         if [ ! -s $frame/SLC/$s/$s.$sext ]; then
+           echo $s" has empty "$sext" - moving to SLC.bad"
+           mkdir -p $frame/SLC.bad
+           mv $frame/SLC/$s $frame/SLC.bad/.
+           break
+         fi
+       done
+     done
+         
    fi
    if [ $slcdates -gt 1 ]; then echo "this frame has SLCs to process: "$frame;
       # check on sizes
