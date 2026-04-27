@@ -367,6 +367,7 @@ if [ $autocont -eq 1 ]; then
       if [ -z $ssize ]; then ssize=0; fi
       if [ $ssize -lt $msize ]; then
         echo $x" has missing bursts filesize: "`echo $ssize/1024/1024/1024 | bc`" GB"
+      fi
       if [ $ssize -lt $msizetol ]; then
         echo "moving to SLC.missingbursts"
         mv SLC/$x SLC.missingbursts/$x
