@@ -32,7 +32,7 @@ if [ -d $frame/geo ]; then
    if [ `ls $frame/*LC | wc -l` -gt 2 ]; then
      echo "WARNING, empty geo folder - running batchcachedir_fix_partly_deleted_frame.sh "$frame;
      #if [ $PROC == 1 ]; then
-     cd $frame; batchcachedir_fix_partly_deleted_frame.sh $frame; cd -
+     batchcachedir_fix_partly_deleted_frame.sh $frame
      #else
      # echo "WARNING, empty geo folder - should run batchcachedir_fix_partly_deleted_frame.sh "$frame;
      # #if [ -d todelete/$frame ]; then rm -r todelete/$frame; fi;

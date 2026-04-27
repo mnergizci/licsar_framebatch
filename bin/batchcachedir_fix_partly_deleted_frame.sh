@@ -4,7 +4,7 @@ if [ -z $1 ]; then
   exit
 fi
 fr=$1
-if [ -d $fr ]; then echo "run this in a subfolder with your frame folder"; exit; fi
+if [ ! -d $fr ]; then echo "run this in a subfolder with your frame folder"; exit; fi
 
 
 echo "restoring missing frame core files from procdir"
